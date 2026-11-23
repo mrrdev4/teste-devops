@@ -1,0 +1,37 @@
+# Maven
+target/
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+dependency-reduced-pom.xml
+
+# Build final
+*.jar
+
+# Logs
+*.log
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# OS (Windows/macOS/Linux)
+.DS_Store
+Thumbs.db
+
+# Arquivos de ambiente (NUNCA versionar!)
+.env
+
+# VSCode Java
+.settings/
+bin/
+
+#Outros
+.tmp/
+
+#Env files
+.env
+*.env
+target/
