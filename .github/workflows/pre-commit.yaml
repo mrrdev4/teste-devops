@@ -10,4 +10,4 @@ jobs:
   PreCommitHooks:
     name: Pre Commit Hooks 🧰
     secrets: inherit # pragma: allowlist secrets
-    uses: mrrdev4/public-shared-workflows/workflows/pre-commit.yml@main
+    uses: mrrdev4/public-shared-workflows/.github/workflows/pre-commit.yml@main
