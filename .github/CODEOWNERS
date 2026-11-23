@@ -1,0 +1,7 @@
+@mrrdev4/github_operacoes
+/.github/ISSUE_TEMPLATE/** @mrrdev4/github_sustain_plat
+/.github/workflows/** @mrrdev4/github_sustain_plat
+/.github/CODEOWNERS @mrrdev4/github_sustain_plat
+/.github/PULL_REQUEST_TEMPLATE.md @mrrdev4/github_sustain_plat
+.pre-commit-config.yaml @mrrdev4/github_sustain_plat
+catalog-info.yaml @mrrdev4/github_sustain_plat

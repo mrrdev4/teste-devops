@@ -1,0 +1,55 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        exclude: ^helm/.*\.yaml$
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/Masabi/git-secrets-pre-commit
+    rev: v0.1
+    hooks:
+      - id: git-secrets-scan
+      - id: git-secrets-commit-msg
+      - id: git-secrets-merge-check
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+        language: system
+        entry: shellcheck
+        files: \.sh$
+
+  - repo: local
+    hooks:
+      - id: checkstyle
+        name: Checkstyle
+        entry: mvn checkstyle:check
+        language: system
+        pass_filenames: false
+      - id: spotless
+        name: Spotless Format Check
+        entry: mvn spotless:check
+        language: system
+        pass_filenames: false
+      - id: spotless-apply
+        name: Spotless Apply
+        entry: mvn spotless:apply
+        language: system
+        pass_filenames: false
+        always_run: true

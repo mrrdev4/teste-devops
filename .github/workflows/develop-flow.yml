@@ -1,0 +1,132 @@
+name: Build & Deploy Dev 🚀
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "bugfix/**"
+      - "hotfix/**"
+  workflow_dispatch: {}
+
+concurrency:
+  group: dev-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Guard 🛡️
+    secrets: inherit # pragma: allowlist secrets
+    uses: mrrdev4/shared-workflows/.github/workflows/check-rules.yml@main
+    with:
+      runs_on: '["ubuntu-latest"]'
+      trigger_event_name: ${{ github.event_name }}
+      push_created: ${{ github.event.created }}
+      main_branch: "main"
+      release_prefix: "release/"
+      feature_prefix: "feature/"
+      bugfix_prefix: "bugfix/"
+      hotfix_prefix: "hotfix/"
+      ignore_bot_prs: true
+      allow_workflow_dispatch: true
+
+  sonar:
+    name: SonarQube Scan 🔍
+    needs: [validate]
+    if: >-
+      ${{
+        needs.validate.result == 'success' &&
+        needs.validate.outputs.should_run_sonar == 'true' &&
+        !(
+          github.event_name == 'push' &&
+          github.event.created == true &&
+          github.event.commits[0] == null
+        )
+      }}
+    secrets: inherit # pragma: allowlist secret
+    uses: mrrdev4/shared-workflows/.github/workflows/sonar-java.yml@main
+    with:
+      runs_on: '["ubuntu-latest"]'
+      context: "."
+      unit_tests_enabled: true
+      coverage_required: true
+      sonar_enabled: false
+      sonar_project_name: "testeDevops"
+      sonar_project_key: "com.vtal.testeDevops"
+      sonar_sources: "src/main/java"
+      sonar_tests: "src/test/java"
+      sonar_exclusions: "**/*.md,**/target/**,**/build/**,**/.gradle/**"
+
+  build:
+    name: Build Maven & Push GAR ♻️
+    needs: [validate, sonar]
+    if: >-
+      ${{ always() &&
+        needs.validate.result == 'success' &&
+        needs.validate.outputs.should_run_dev == 'true' &&
+        (
+          needs.validate.outputs.should_run_sonar != 'true' ||
+          needs.sonar.result == 'success'
+        )
+      }}
+    secrets: inherit # pragma: allowlist secret
+    uses: mrrdev4/shared-workflows/.github/workflows/build-maven.yml@feature/add-deploy-vm-gcp
+    with:
+      runs_on: '["ubuntu-latest"]'
+      java_version: "21"
+      maven_version: "3.9.9"
+      push_sha_tag: false
+      gcp_maven_repository_url: ${{ vars.GCP_MAVEN_REPOSITORY_URL }}
+      gcp_service_account: ${{ vars.GCP_REGISTRY_SERVICE_ACCOUNT }}
+      maven_args: "-B clean package -DskipTests"
+
+  deploy_dev:
+    name: Deploy Dev ⛵
+    needs: [validate, build]
+    if: >-
+      ${{
+        needs.validate.result == 'success' &&
+        needs.build.result == 'success'
+      }}
+    uses: mrrdev4/shared-workflows/.github/workflows/deploy-vm-gcp.yml@feature/add-deploy-vm-gcp
+    with:
+      runs_on: '{"group":"devops-sre","labels":["self-hosted","devops-sre-DEV"]}'
+      environment: "Dev"
+      repository_url: ${{ needs.build.outputs.repository_url }}
+      group_id: ${{ needs.build.outputs.group_id }}
+      artifact_id: ${{ needs.build.outputs.artifact_id }}
+      artifact_version: ${{ needs.build.outputs.artifact_version }}
+      gcp_service_account: ${{ vars.GCP_REGISTRY_SERVICE_ACCOUNT }}
+    permissions:
+      contents: read
+      id-token: write
+
+
+  summary:
+    name: Summary 📜
+    needs: [validate, sonar, build, deploy_dev]
+    runs-on: [ubuntu-latest]
+    if: ${{ always() }}
+    steps:
+      - name: Final Summary
+        shell: bash
+        run: |
+          {
+            echo "## Dev Push Flow — Resumo"
+            echo "- branch: \`${GITHUB_REF_NAME}\`"
+            echo "- build: \`${{ needs.build.result || 'skipped' }}\`"
+
+            IMAGE="${{ needs.build.outputs.image_by_digest }}"
+            if [[ -n "${IMAGE}" ]]; then
+              echo "- image: \`${IMAGE}\`"
+            else
+              echo "- image: \`<none>\`"
+            fi
+
+            echo "- deploy_dev: \`${{ needs.deploy_dev.result || 'skipped' }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

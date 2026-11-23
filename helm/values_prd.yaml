@@ -1,0 +1,100 @@
+appName: "testeDevops"
+image:
+  ref: ""
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}
+  automountServiceAccountToken: false
+
+backstage:
+  kubernetesId: "testeDevops"
+
+service:
+  port: 8080
+  targetPort: http
+
+registrySecret:
+  create: false
+
+envFrom: []
+
+imagePullSecrets:
+  - name: secret-nexus
+  - name: secret-proxy
+
+env:
+  - name: ENVIRONMENT
+    value: "Prd"
+
+route:
+  enabled: true
+  host: ""
+  domain: ""
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+probes:
+  liveness:
+    enabled: false
+    httpGet:
+      path: /healthz
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+
+  readiness:
+    enabled: false
+    httpGet:
+      path: /healthz
+      port: 8080
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    failureThreshold: 6
+
+  startup:
+    enabled: false
+    httpGet:
+      path: /healthz
+      port: 8080
+    periodSeconds: 10
+    failureThreshold: 30
+
+hpa:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  metrics:
+   - type: Resource
+     resource:
+       name: cpu
+       target:
+         type: Utilization
+         averageUtilization: 80
+  behavior:
+   scaleUp:
+     stabilizationWindowSeconds: 0
+     policies:
+       - type: Percent
+         value: 100
+         periodSeconds: 15
+   scaleDown:
+     stabilizationWindowSeconds: 300
+     policies:
+       - type: Percent
+         value: 100
+         periodSeconds: 15

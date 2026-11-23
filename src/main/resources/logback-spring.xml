@@ -1,0 +1,36 @@
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp>
+          <fieldName>@timestamp</fieldName>
+        </timestamp>
+        <logLevel>
+          <fieldName>log.level</fieldName>
+        </logLevel>
+        <loggerName>
+          <fieldName>log.logger</fieldName>
+        </loggerName>
+        <threadName>
+          <fieldName>process.thread.name</fieldName>
+        </threadName>
+        <message>
+          <fieldName>message</fieldName>
+        </message>
+        <mdc>
+          <fieldNames>
+            <traceId>trace.id</traceId>
+            <spanId>transaction.id</spanId>
+          </fieldNames>
+        </mdc>
+        <stackTrace>
+          <fieldName>error.stack_trace</fieldName>
+        </stackTrace>
+      </providers>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>

@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "testeDevops"
+  description: API Java com suporte a health check, Swagger, tracing e logs ECS.
+  tags:
+    - api
+    - java
+    - observability
+    - ecs-logs
+  annotations:
+    github.com/project-slug: mrrdev4/common-internal-privado-api-testedevops
+    backstage.io/kubernetes-id: "testeDevops"
+    backstage.io/kubernetes-namespace: testeDevops
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:mrrdev4/github_operacoes
+  system: common
+  definition: vazio

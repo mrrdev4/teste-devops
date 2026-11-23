@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussão técnica
+    url: https://github.com/mrrdev4/common.internal.privado.api.testeDevops/discussions
+    about: Use discussões para brainstorm ou dúvidas antes de abrir uma issue

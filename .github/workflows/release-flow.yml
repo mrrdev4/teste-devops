@@ -1,0 +1,131 @@
+name: Release Flow 🚀
+
+on:
+  workflow_dispatch: {}
+  create:
+    branches:
+      - "release/**"
+  pull_request:
+    branches: ["main", "release/**"]
+    types: [opened, reopened, synchronize, ready_for_review, closed]
+  push:
+    branches:
+      - "release/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  validate:
+    name: Guard 🛡️
+    if: >-
+      ${{ !(
+        github.event_name == 'push' &&
+        github.event.created == true &&
+        startsWith(github.ref_name, 'release/')
+      ) }}
+    uses: mrrdev4/shared-workflows/.github/workflows/check-rules.yml@main
+    secrets: inherit # pragma: allowlist secret
+    with:
+      runs_on: '["ubuntu-latest"]'
+      trigger_event_name: ${{ github.event_name }}
+      push_created: ${{ (github.event_name == 'push' && github.event.created) || false }}
+      main_branch: "main"
+      release_prefix: "release/"
+      feature_prefix: "feature/"
+      bugfix_prefix: "bugfix/"
+      hotfix_prefix: "hotfix/"
+      ignore_bot_prs: true
+      allow_workflow_dispatch: true
+
+  sonar:
+    name: SonarQube Scan 🔍
+    needs: [validate]
+    if: >-
+      ${{
+        needs.validate.result == 'success' &&
+        needs.validate.outputs.should_run_sonar == 'true'
+      }}
+    secrets: inherit # pragma: allowlist secret
+    uses: mrrdev4/shared-workflows/.github/workflows/sonar-java.yml@main
+    with:
+      runs_on: '["ubuntu-latest"]'
+      context: "."
+      unit_tests_enabled: true
+      coverage_required: true
+      sonar_enabled: false
+      sonar_project_name: "testeDevops"
+      sonar_project_key: "com.vtal.testeDevops"
+      sonar_sources: "src/main/java"
+      sonar_tests: "src/test/java"
+      sonar_exclusions: "**/*.md,**/target/**,**/build/**,**/.gradle/**"
+
+  releaseflow:
+    name: Release Flow 🚀
+    needs: [validate, sonar]
+    if: >-
+      ${{
+        always() &&
+        needs.validate.result == 'success' &&
+        needs.validate.outputs.should_run == 'true' &&
+        (
+          needs.validate.outputs.should_run_sonar != 'true' ||
+          needs.sonar.result == 'success'
+        )
+      }}
+    secrets: inherit # pragma: allowlist secret
+    uses: mrrdev4/shared-workflows/.github/workflows/releaseflow-maven.yml@feature/add-deploy-vm-gcp
+    with:
+      runs_on: '["ubuntu-latest"]'
+      trigger_event_name: ${{ github.event_name }}
+      main_branch: "main"
+      release_prefix: "release/"
+
+      # ---- Build Maven ----
+      working_directory: "."
+      java_version: "21"
+      java_distribution: "temurin"
+      maven_version: "3.9.9"
+      maven_args: "-B clean package -DskipTests"
+
+      # ---- GCP Artifact Registry (Opcional se já estiver nas vars do repo/org) ----
+      gcp_maven_repository_url: ${{ vars.GCP_MAVEN_REPOSITORY_URL }}
+      gcp_workload_identity_provider: ${{ vars.GCP_REGISTRY_WIF_PROVIDER }}
+      gcp_service_account: ${{ vars.GCP_REGISTRY_SERVICE_ACCOUNT }}
+
+      # ---- Controle de Deploys VM GCP ----
+      enable_deploy_dev: "true"
+      enable_deploy_ti: "true"
+      enable_deploy_trg: "true"
+      enable_deploy_prd: "true"
+
+      # ---- GitHub Environments (onde ficam APP_FOLDER, APP_NAME, APP_SERVICE_NAME) ----
+      environment_dev: "dev"
+      environment_ti: "ti"
+      environment_trg: "trg"
+      environment_prd: "prd"
+
+      # ---- Runners Self-Hosted de cada VM de destino (usados quando multi_vm_* = false) ----
+      runs_on_dev: '{"group":"devops-sre","labels":["self-hosted","devops-sre-DEV"]}'
+      runs_on_ti:  '{"group":"devops-sre","labels":["self-hosted","devops-sre-TI"]}'
+      runs_on_trg: '{"group":"devops-sre","labels":["self-hosted","devops-sre-TRG"]}'
+      runs_on_prd: '{"group":"devops-sre","labels":["self-hosted","devops-sre-PRD"]}'
+
+      # ---- Multi-VM (matrix) ----
+      # multi_vm_* = true  => deploy em todas as VMs da lista (vars.VMS_*)
+      runner_group: "devops-sre"
+
+      multi_vm_dev: false
+      vms_dev: ${{ vars.VMS_DEV }}
+
+      multi_vm_ti: false
+      vms_ti: ${{ vars.VMS_TI }}
+
+      multi_vm_trg: false
+      vms_trg: ${{ vars.VMS_TRG }}
+
+      multi_vm_prd: false
+      vms_prd: ${{ vars.VMS_PRD }}

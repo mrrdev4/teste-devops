@@ -1,0 +1,36 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
+app:
+  environment: INFO
+  otel-endpoint: ${{OTEL_ENDPOINT}}
+
+spring:
+  application:
+    name: testeDevops
+
+  mvc:
+    servlet:
+      path: /api/v1
+    throw-exception-if-no-handler-found: true  # Deprecated, usado apenas para suportar NoHandlerFoundException
+
+  devtools:
+    restart:
+      enabled: false  # Desativa reinicialização automática no DevTools
+
+conjur:
+  tokenPath: /var/run/secrets/tokens/access-token
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  tracing:
+    sampling:
+      probability: 1.0

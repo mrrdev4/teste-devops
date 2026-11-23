@@ -1,0 +1,4 @@
+#Sun Nov 22 19:35:56 BRT 2026
+configuration*?=F3AD6A524FD99BAA0B917C3F0A771854B3E4CE36
+module-resource*?\:checkstyle-suppressions.xml=7FDE12C8E1D960813DE514B2B9D44D91B16A8AAA
+module-resource*?\:checkstyle-xpath-suppressions.xml=6D78C99358BC3723477EEA8B8B68D31AF409B014
