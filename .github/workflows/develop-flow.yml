@@ -22,7 +22,7 @@ jobs:
   validate:
     name: Guard 🛡️
     secrets: inherit # pragma: allowlist secrets
-    uses: mrrdev4/shared-workflows/.github/workflows/check-rules.yml@main
+    uses: mrrdev4/public-shared-workflows.github/workflows/check-rules.yml@main
     with:
       runs_on: '["ubuntu-latest"]'
       trigger_event_name: ${{ github.event_name }}
@@ -49,7 +49,7 @@ jobs:
         )
       }}
     secrets: inherit # pragma: allowlist secret
-    uses: mrrdev4/shared-workflows/.github/workflows/sonar-java.yml@main
+    uses: mrrdev4/public-shared-workflows.github/workflows/sonar-java.yml@main
     with:
       runs_on: '["ubuntu-latest"]'
       context: "."
@@ -75,7 +75,7 @@ jobs:
         )
       }}
     secrets: inherit # pragma: allowlist secret
-    uses: mrrdev4/shared-workflows/.github/workflows/build-maven.yml@feature/add-deploy-vm-gcp
+    uses: mrrdev4/public-shared-workflows.github/workflows/build-maven.yml@feature/add-deploy-vm-gcp
     with:
       runs_on: '["ubuntu-latest"]'
       java_version: "21"
@@ -93,7 +93,7 @@ jobs:
         needs.validate.result == 'success' &&
         needs.build.result == 'success'
       }}
-    uses: mrrdev4/shared-workflows/.github/workflows/deploy-vm-gcp.yml@feature/add-deploy-vm-gcp
+    uses: mrrdev4/public-shared-workflows.github/workflows/deploy-vm-gcp.yml@feature/add-deploy-vm-gcp
     with:
       runs_on: '{"group":"devops-sre","labels":["self-hosted","devops-sre-DEV"]}'
       environment: "Dev"

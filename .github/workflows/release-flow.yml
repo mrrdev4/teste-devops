@@ -27,7 +27,7 @@ jobs:
         github.event.created == true &&
         startsWith(github.ref_name, 'release/')
       ) }}
-    uses: mrrdev4/shared-workflows/.github/workflows/check-rules.yml@main
+    uses: mrrdev4/public-shared-workflows.github/workflows/check-rules.yml@main
     secrets: inherit # pragma: allowlist secret
     with:
       runs_on: '["ubuntu-latest"]'
@@ -50,7 +50,7 @@ jobs:
         needs.validate.outputs.should_run_sonar == 'true'
       }}
     secrets: inherit # pragma: allowlist secret
-    uses: mrrdev4/shared-workflows/.github/workflows/sonar-java.yml@main
+    uses: mrrdev4/public-shared-workflows.github/workflows/sonar-java.yml@main
     with:
       runs_on: '["ubuntu-latest"]'
       context: "."
@@ -77,7 +77,7 @@ jobs:
         )
       }}
     secrets: inherit # pragma: allowlist secret
-    uses: mrrdev4/shared-workflows/.github/workflows/releaseflow-maven.yml@feature/add-deploy-vm-gcp
+    uses: mrrdev4/public-shared-workflows.github/workflows/releaseflow-maven.yml@feature/add-deploy-vm-gcp
     with:
       runs_on: '["ubuntu-latest"]'
       trigger_event_name: ${{ github.event_name }}

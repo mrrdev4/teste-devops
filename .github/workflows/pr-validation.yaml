@@ -13,4 +13,4 @@ jobs:
   PrValidation:
     name: Validate PR Structure 🔍
     secrets: inherit # pragma: allowlist secrets
-    uses: mrrdev4/shared-workflows/.github/workflows/pr-validation.yml@main
+    uses: mrrdev4/public-shared-workflows.github/workflows/pr-validation.yml@main
