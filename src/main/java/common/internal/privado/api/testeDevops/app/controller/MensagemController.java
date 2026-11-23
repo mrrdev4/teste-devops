@@ -25,7 +25,7 @@ public class MensagemController {
 
   @GetMapping
   public String hello() {
-    return "Hello World!";
+    return "Hello World2!";
   }
 
   @GetMapping("/{id}")

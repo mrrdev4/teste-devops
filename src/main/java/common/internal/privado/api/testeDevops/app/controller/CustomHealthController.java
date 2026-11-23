@@ -13,7 +13,7 @@ public class CustomHealthController implements HealthIndicator {
     // TODO your code here to validate the health of your service
     boolean healthy = true;
     if (healthy) {
-      return Health.up().withDetail("custom", "ok2").build();
+      return Health.up().withDetail("custom", "ok").build();
     } else {
       return Health.down().withDetail("custom", "fail").build();
     }
