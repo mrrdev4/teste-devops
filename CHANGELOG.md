@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/mrrdev4/teste-devops/compare/v1.2.0...v1.3.0) (2026-11-24)
+
+
+### Features
+
+* update endpoints ([4b43cc2](https://github.com/mrrdev4/teste-devops/commit/4b43cc2ebf93ef3753b7489f8e19e7656afa7874))
+* update endpoints ([ca4ea97](https://github.com/mrrdev4/teste-devops/commit/ca4ea977868dfad472b23214a43b248ed4ab6b3d))
+
 ## [1.2.0](https://github.com/mrrdev4/teste-devops/compare/v1.1.0...v1.2.0) (2026-11-24)
 
 
