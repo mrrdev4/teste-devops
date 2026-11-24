@@ -97,29 +97,29 @@ jobs:
       gcp_service_account: ${{ vars.GCP_REGISTRY_SERVICE_ACCOUNT }}
 
       # ---- Controle de Deploys VM GCP ----
-      enable_deploy_dev: "true"
       enable_deploy_ti: "true"
       enable_deploy_trg: "true"
+      enable_deploy_hml: "true"
       enable_deploy_prd: "true"
 
-      # ---- GitHub Environments (onde ficam APP_FOLDER, APP_NAME, APP_SERVICE_NAME) ----
+      # ---- GitHub Environments ----
+      # Não retirar o env dev, necessário para o resolve artifact buscar o último build
       environment_dev: "dev"
+      # envs que serão deployados pelo release-flow
       environment_ti: "ti"
       environment_trg: "trg"
+      environment_hml: "hml"
       environment_prd: "prd"
 
-      # ---- Runners Self-Hosted de cada VM de destino (usados quando multi_vm_* = false) ----
-      runs_on_dev: '{"group":"devops-sre","labels":["self-hosted","devops-sre-DEV"]}'
+      # ---- Runners Self-Hosted ----
       runs_on_ti:  '{"group":"devops-sre","labels":["self-hosted","devops-sre-TI"]}'
       runs_on_trg: '{"group":"devops-sre","labels":["self-hosted","devops-sre-TRG"]}'
+      runs_on_hml: '{"group":"devops-sre","labels":["self-hosted","devops-sre-HML"]}'
       runs_on_prd: '{"group":"devops-sre","labels":["self-hosted","devops-sre-PRD"]}'
 
       # ---- Multi-VM (matrix) ----
       # multi_vm_* = true  => deploy em todas as VMs da lista (vars.VMS_*)
       runner_group: "devops-sre"
-
-      multi_vm_dev: false
-      vms_dev: ${{ vars.VMS_DEV }}
 
       multi_vm_ti: false
       vms_ti: ${{ vars.VMS_TI }}
@@ -127,5 +127,8 @@ jobs:
       multi_vm_trg: false
       vms_trg: ${{ vars.VMS_TRG }}
 
-      multi_vm_prd: false
+      multi_vm_hml: false
+      vms_hml: ${{ vars.VMS_HML }}
+
+      multi_vm_prd: true
       vms_prd: ${{ vars.VMS_PRD }}
