@@ -28,6 +28,11 @@ public class MensagemController {
     return "Hello World!";
   }
 
+  @GetMapping("/hello")
+  public String hello2() {
+    return "Hello World2!";
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<MensagemResponse> buscar(@PathVariable UUID id) {
     // Mock temporário até termos persistência
