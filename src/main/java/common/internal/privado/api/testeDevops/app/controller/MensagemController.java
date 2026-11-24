@@ -30,7 +30,7 @@ public class MensagemController {
 
   @GetMapping("/hello")
   public String hello2() {
-    return "Hello World2!";
+    return "Hello World3!";
   }
 
   @GetMapping("/{id}")
